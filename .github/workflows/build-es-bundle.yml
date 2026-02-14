@@ -24,6 +24,7 @@ jobs:
           npm install
           npm run build
         env:
+          WIREIT_CACHE: local
           WIREIT_FAILURES: continue
 
       - name: Bundle
