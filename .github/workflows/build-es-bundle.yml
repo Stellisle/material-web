@@ -2,6 +2,7 @@ name: Build ES Bundle
 
 on:
   workflow_dispatch
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -10,12 +11,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      
+
       - uses: actions/setup-node@v3
         with:
           node-version: 20
           cache: npm
           cache-dependency-path: ./material-web/package-lock.json
+          
       - uses: google/wireit@setup-github-actions-caching/v1
 
       - name: Build
@@ -30,19 +32,15 @@ jobs:
       - name: Bundle
         run: |
           cd ./material-web
-          npx esbuild --bundle --minify --format=esm --outfile=../dist/bundle.esm.min.js all.js
+          # 创建输出目录
+          mkdir -p ./dist
+          # 输出到当前目录的 dist 文件夹（便于上传）
+          npx esbuild --bundle --minify --format=esm --outfile=./dist/bundle.esm.min.js all.js
 
-      - name: Archive bundle
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ESM Bundle
-          path: dist/bundle.esm.min.js
-
-      - name: Commit bundle
-        run: |
-          git config --global user.name "Luke Vo"
-          git config --global user.email "datvm@outlook.com"
-          git add ./dist/bundle.esm.min.js -f
-          git commit -m "Added built ESM bundle"
-          git push origin main
-        
+          name: esm-bundle  # 产物名称
+          path: ./material-web/dist/bundle.esm.min.js  # 产物路径
+          retention-days: 30  # 保留30天（可选）
+          if-no-files-found: error  # 如果找不到文件就报错
