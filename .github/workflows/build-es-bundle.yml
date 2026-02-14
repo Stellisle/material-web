@@ -21,7 +21,7 @@ jobs:
       - name: Build
         run: |
           cd ./material-web
-          npm ci
+          npm install
           npm run build
         env:
           WIREIT_FAILURES: continue
